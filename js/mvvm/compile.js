@@ -85,6 +85,7 @@ Compile.prototype = {
           compileUtil.eventHandler(node, me.$vm, exp, dir);
         // 如果是普通指令
         } else {
+          // 调用对应工具函数去解析
           compileUtil[dir] && compileUtil[dir](node, me.$vm, exp);
         }
 
@@ -221,11 +222,7 @@ var updater = {
   // 更新节点的className属性值
   classUpdater: function (node, value, oldValue) {
     var className = node.className;
-    className = className.replace(oldValue, '').replace(/\s$/, '');
-
-    var space = className && String(value) ? ' ' : '';
-
-    node.className = className + space + value;
+    node.className = className + (className ? ' ' : '') + value;
   },
 
   // 更新节点的value属性值
