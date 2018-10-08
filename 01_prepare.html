@@ -17,7 +17,6 @@
 </div>
 
 
-
 <!--
 1. [].slice.call(lis): 将伪数组转换为真数组
 2. node.nodeType: 得到节点类型
@@ -81,11 +80,11 @@
     // writable: false,
     /*存取描述符*/
     //get: 回调函数, 用来得到当前属性值
-    get () {
+    get() {
       return this.firstName + '-' + this.lastName
     },
     //set: 回调函数, 用来监视当前属性值的变化
-    set (value) {
+    set(value) {
       const names = value.split('-')
       this.firstName = names[0]
       this.lastName = names[1]
@@ -109,7 +108,42 @@
   console.log(p.toString, p.hasOwnProperty('toString')) // 函数 false
 
   //6. DocumentFragment: 文档碎片(高效批量更新多个节点)
+  /*
+  <div id="demo">
+    <ul>
+      <li>test1</li>
+      <li>test2</li>
+      <li>test3</li>
+      <li>test3</li>
+      <li>test3</li>
+      <li>test3</li>
+      <li>test3</li>
+      <li>test3</li>
+      <li>test3</li>
+      <li>test3</li>
+      <li>test3</li>
+      <li>test3</li>
+    </ul>
+  </div>
+*/
+  // 1. 创建fragment容器对象
+  const fragment = document.createDocumentFragment()
+  // 2. 取出ul中所有子节点保存到fragment中
+  const div = document.getElementById('demo')
+  let child
+  while(child=div.firstChild) { // 一个子节点只能有一个父节点
+    fragment.appendChild(child)  // 从div移除child节点, 添加为fragment的子节点
+  }
 
+  // 3. 遍历修改fragment中所有li标签的文本
+  Array.prototype.slice.call(fragment.children[0].childNodes).forEach(node => {
+    if(node.nodeType===1) {
+      node.textContent = 'atguigu' // 不会更新界面
+    }
+  })
+
+  // 4. 将fragment添加为div的子节点
+  div.appendChild(fragment) // 批量更新
 
   /*
   所有函数都有3个方法: call()/apply()/bind()
