@@ -31,11 +31,11 @@
             	* 事件指令解析
             	* 一般指令解析
       	3). 将解析后的fragment添加到el中显示
-    3.解析表达式文本节点
+    3.解析表达式文本节点: textNode.textContent = value
       	1). 根据正则对象得到匹配出的表达式字符串: 子匹配/RegExp.$1
       	2). 从data中取出表达式对应的属性值
       	3). 将属性值设置为文本节点的textContent
-    4.事件指令解析
+    4.事件指令解析: elementNode.addEventListener('eventName', callback)
       	1). 从指令名中取出事件名
       	2). 根据指令的值(表达式)从methods中得到对应的事件处理函数对象
       	3). 给当前元素节点绑定指定事件名和回调函数的dom事件监听

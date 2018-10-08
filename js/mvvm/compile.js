@@ -1,10 +1,16 @@
 function Compile(el, vm) {
+  // 保存vm
   this.$vm = vm;
+  // 保存el元素
   this.$el = this.isElementNode(el) ? el : document.querySelector(el);
 
+  // 如果el存在
   if (this.$el) {
+    // 1. 取出el中所有子节点保存到内存的fragment容器中
     this.$fragment = this.node2Fragment(this.$el);
+    // 2. 编译fragment中所有层次的子节点
     this.init();
+    // 3. 将编译好的fragment添加到el中
     this.$el.appendChild(this.$fragment);
   }
 }
@@ -23,52 +29,72 @@ Compile.prototype = {
   },
 
   init: function () {
+    // 编译fragment中所有子节点
     this.compileElement(this.$fragment);
   },
 
   compileElement: function (el) {
+    // 得到所有子节点
     var childNodes = el.childNodes,
       me = this;
 
+    // 遍历所有子节点
     [].slice.call(childNodes).forEach(function (node) {
+      // 得到节点的文本内容
       var text = node.textContent;
+      // 定义匹配大括号表达式的正则对象
       var reg = /\{\{(.*)\}\}/;  // {{name}}
 
+      // 如果当前节点是元素
       if (me.isElementNode(node)) {
+        // 编译元素节点的指令
         me.compile(node);
-
+        // 如果节点是一个大括号表达式格式的文本节点
       } else if (me.isTextNode(node) && reg.test(text)) {
-        me.compileText(node, RegExp.$1);
+        // 编译大括号表达式格式的文本节点
+        me.compileText(node, RegExp.$1); // $1就是表达式: name
       }
 
+      // 如果当前子节点还有子节点
       if (node.childNodes && node.childNodes.length) {
+        // 那就递归调用, 实现所有层次子节点的编译
         me.compileElement(node);
       }
     });
   },
 
+  // 编译元素节点中的所有指令属性
   compile: function (node) {
+    // 得到所有属性节点
     var nodeAttrs = node.attributes,
       me = this;
 
+    // 遍历所有属性
     [].slice.call(nodeAttrs).forEach(function (attr) {
+      // 得到属性名: v-on:click
       var attrName = attr.name;
+      // 如果是一个指令属性
       if (me.isDirective(attrName)) {
+        // 得到属性值, 也就是表达式: test
         var exp = attr.value;
+        // 得到指令名: on:click
         var dir = attrName.substring(2);
-        // 事件指令
+        // 如果是事件指令
         if (me.isEventDirective(dir)) {
+          // 解析事件指令
           compileUtil.eventHandler(node, me.$vm, exp, dir);
-          // 普通指令
+        // 如果是普通指令
         } else {
           compileUtil[dir] && compileUtil[dir](node, me.$vm, exp);
         }
 
+        // 移除指令属性
         node.removeAttribute(attrName);
       }
     });
   },
 
+  // 编译文本节点
   compileText: function (node, exp) {
     compileUtil.text(node, this.$vm, exp);
   },
@@ -125,12 +151,14 @@ var compileUtil = {
   },
 
   /*
-  exp: 表达式
+  exp: 表达式   name
   dir: 指令名   text/html/model/class
    */
   bind: function (node, vm, exp, dir) {
+    // 根据指令名得到对应的节点更新函数
     var updaterFn = updater[dir + 'Updater'];
 
+    // 如果函数存在, 调用函数更新节点--> 实现初始化显示
     updaterFn && updaterFn(node, this._getVMVal(vm, exp));
 
     new Watcher(vm, exp, function (value, oldValue) {
@@ -140,14 +168,18 @@ var compileUtil = {
 
   // 事件处理
   eventHandler: function (node, vm, exp, dir) {
+    // 得到事件名(类型): click
     var eventType = dir.split(':')[1],
+      // 得到methods中表达式对应的事件回调函数: test
       fn = vm.$options.methods && vm.$options.methods[exp];
-
+    // 如果都存在
     if (eventType && fn) {
+      // 给节点绑定指定事件名和回调函数的dom事件监听, 强制绑定了回调函数this为vm
       node.addEventListener(eventType, fn.bind(vm), false);
     }
   },
 
+  // 得到指定表达式对应的data中的某个属性值
   _getVMVal: function (vm, exp) {
     var val = vm._data;
     exp = exp.split('.');
