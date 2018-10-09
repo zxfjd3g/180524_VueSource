@@ -162,7 +162,9 @@ var compileUtil = {
     // 如果函数存在, 调用函数更新节点--> 实现初始化显示
     updaterFn && updaterFn(node, this._getVMVal(vm, exp));
 
+    // 为当前表达式创建对应的watcher对象, 并指定用于更新当前节点的回调函数
     new Watcher(vm, exp, function (value, oldValue) {
+      // 更新节点
       updaterFn && updaterFn(node, value, oldValue);
     });
   },

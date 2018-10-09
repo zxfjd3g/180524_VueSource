@@ -1,5 +1,5 @@
 ## 1. 准备
-	1.[].slice.call(lis): 将伪数组转换为真数组
+	1.Array.prototype.slice.call(lis): 将伪数组转换为真数组
 	2.node.nodeType: 得到节点类型
 	3.Object.defineProperty(obj, propertyName, {}): 给对象添加/修改属性(指定描述符)
 		configurable: true/false  是否可以重新define
@@ -123,6 +123,6 @@
       deactivate breakpoints: 使所有断点暂时失效
       
       call stack: 显示是程序函数调用的过程
-      scop: 当前执行环境对应的作用域中包含的变量数据
+      scope: 当前执行环境对应的作用域中包含的变量数据
       breakpoints: 断点列表
       
