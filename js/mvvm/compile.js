@@ -135,12 +135,14 @@ var compileUtil = {
 
     var me = this,
       val = this._getVMVal(vm, exp);
-    node.addEventListener('input', function (e) {
+    // 绑定input事件监听
+    node.addEventListener('input', function (e) { // 一旦输入框中的数据发生改变就回调
+      // 得到最新的值
       var newValue = e.target.value;
       if (val === newValue) {
         return;
       }
-
+      // 将最新的值保存给表达式所对应的属性值, 就会导致对应的set调用, 从而更新相关的所有界面
       me._setVMVal(vm, exp, newValue);
       val = newValue;
     });
